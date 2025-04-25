@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="800" height="600" xmlns="http://www.w3.org/2000/svg">
+    <!-- Styles -->
+    <style>
+        .title { font: bold 24px sans-serif; }
+        .module { font: bold 16px sans-serif; }
+        .component { font: 14px sans-serif; }
+        .arrow { stroke: #666; stroke-width: 2; fill: none; marker-end: url(#arrowhead); }
+        .box { fill: #f0f0f0; stroke: #666; stroke-width: 2; rx: 10; }
+        .highlight { fill: #e1f5fe; }
+    </style>
+    
+    <!-- Arrow marker definition -->
+    <defs>
+        <marker id="arrowhead" markerWidth="10" markerHeight="7" refX="9" refY="3.5" orient="auto">
+            <polygon points="0 0, 10 3.5, 0 7" fill="#666"/>
+        </marker>
+    </defs>
+    
+    <!-- Project Title -->
+    <text x="400" y="40" class="title" text-anchor="middle">Binary Options Signal Project</text>
+    
+    <!-- Backend Module -->
+    <rect x="50" y="100" width="200" height="160" class="box highlight"/>
+    <text x="150" y="130" class="module" text-anchor="middle">Backend (FastAPI)</text>
+    <text x="70" y="160" class="component">• WebSocket Server</text>
+    <text x="70" y="180" class="component">• Redis Integration</text>
+    <text x="70" y="200" class="component">• Connection Manager</text>
+    <text x="70" y="220" class="component">• Health Check API</text>
+    <text x="70" y="240" class="component">• Static File Serving</text>
+    
+    <!-- Data Processing Module -->
+    <rect x="300" y="100" width="200" height="160" class="box"/>
+    <text x="400" y="130" class="module" text-anchor="middle">Data Processing</text>
+    <text x="320" y="160" class="component">• ML Model Training</text>
+    <text x="320" y="180" class="component">• Data Processing</text>
+    <text x="320" y="200" class="component">• Model Persistence</text>
+    <text x="320" y="220" class="component">• Backtesting</text>
+    
+    <!-- Simulation Module -->
+    <rect x="550" y="100" width="200" height="160" class="box"/>
+    <text x="650" y="130" class="module" text-anchor="middle">Simulation</text>
+    <text x="570" y="160" class="component">• Signal Generation</text>
+    <text x="570" y="180" class="component">• Market Simulation</text>
+    <text x="570" y="200" class="component">• Testing Scenarios</text>
+    
+    <!-- Frontend/Client -->
+    <rect x="300" y="350" width="200" height="120" class="box"/>
+    <text x="400" y="380" class="module" text-anchor="middle">Web Client</text>
+    <text x="320" y="410" class="component">• WebSocket Client</text>
+    <text x="320" y="430" class="component">• Signal Display</text>
+    
+    <!-- Connections -->
+    <!-- Simulation to Data Processing -->
+    <path d="M 550,180 L 500,180" class="arrow"/>
+    
+    <!-- Data Processing to Backend -->
+    <path d="M 300,180 L 250,180" class="arrow"/>
+    
+    <!-- Backend to Frontend -->
+    <path d="M 150,260 C 150,350 250,400 300,400" class="arrow"/>
+</svg>

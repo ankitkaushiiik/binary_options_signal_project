@@ -112,6 +112,8 @@ def run_backtest_fold(model_name, X_train, y_train, X_test, y_test):
         print(f"Skipping model '{model_name}' (not available or unknown).")
         return None
 
+        
+
     print(f"  Training {model_name}...")
     start_train_time = time.time()
     scaler = StandardScaler()

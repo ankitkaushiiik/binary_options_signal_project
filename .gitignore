@@ -1,0 +1,18 @@
+# Virtual Environment
+venv/
+
+# OS files
+.DS_Store
+*.dmg
+
+
+
+# IDE settings
+.idea/
+.vscode/
+
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so

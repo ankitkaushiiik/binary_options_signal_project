@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Local Signal Client</title>
+    <style>
+        body { font-family: sans-serif; margin: 15px; }
+        #status { margin-bottom: 10px; font-weight: bold; padding: 5px; border: 1px solid #ccc; display: inline-block;}
+        #messages { list-style-type: none; padding: 0; max-height: 60vh; overflow-y: scroll; border: 1px solid #ccc; margin-top: 10px; min-height: 100px;}
+        #messages li { padding: 8px 5px; border-bottom: 1px solid #eee; font-size: 0.9em; display: flex; justify-content: space-between; flex-wrap: wrap; }
+        #messages li:nth-child(odd) { background-color: #f9f9f9; }
+        .sig-time { font-size: 0.8em; color: #666; width: 140px; text-align: left;}
+        .sig-asset { font-weight: bold; margin-right: 10px; }
+        .sig-call { color: green; font-weight: bold; }
+        .sig-put { color: red; font-weight: bold; }
+        .sig-details { flex-grow: 1; text-align: left; }
+        .sig-conf { margin-left: 15px; color: #333; font-size: 0.9em;}
+    </style>
+</head>
+<body>
+    <h1>Local Signal Test Client</h1>
+    <div id="status">Status: Disconnected</div>
+    <ul id="messages"></ul>
+
+    <script>
+        const wsUrl = "ws://localhost:8000/ws/signals"; // Ensure endpoint matches FastAPI
+        const messagesList = document.getElementById('messages');
+        const statusDiv = document.getElementById('status');
+        let socket;
+        const MAX_SIGNALS_DISPLAY = 100; // Limit messages in the list
+
+        function updateStatus(message, color = "black") {
+            statusDiv.textContent = `Status: ${message}`;
+            statusDiv.style.color = color;
+            statusDiv.style.borderColor = color;
+            console.log(`Status Update: ${message}`);
+        }
+
+        function addSignalToList(signal) {
+            const li = document.createElement('li');
+            const typeClass = signal.type === 'CALL' ? 'sig-call' : 'sig-put';
+            // Format timestamp nicely
+            let displayTime = signal.timestamp;
+            try {
+               displayTime = new Date(signal.timestamp).toLocaleString();
+            } catch(e){ console.warn("Could not parse timestamp", signal.timestamp); }
+
+            li.innerHTML = `
+                <span class="sig-time">${displayTime}</span>
+                <div class="sig-details">
+                  <span class="sig-asset">${signal.asset}</span>
+                  <span class="${typeClass}">${signal.type} (${signal.expiry_minutes}m)</span>
+                  <span class="sig-conf">Conf: ${signal.confidence}%</span>
+                </div>
+            `;
+            // Prepend new messages
+            messagesList.insertBefore(li, messagesList.firstChild);
+            // Limit number of signals displayed
+            while (messagesList.children.length > MAX_SIGNALS_DISPLAY) {
+                messagesList.removeChild(messagesList.lastChild);
+            }
+        }
+
+        function connectWebSocket() {
+            console.log(`Attempting to connect to WebSocket: ${wsUrl}`);
+            updateStatus("Connecting...", "orange");
+
+            if (socket && socket.readyState !== WebSocket.CLOSED) {
+                 console.log("Closing existing socket before reconnecting.");
+                 socket.close();
+            }
+
+            socket = new WebSocket(wsUrl);
+
+            socket.onopen = function(event) {
+                updateStatus("Connected", "green");
+            };
+
+            socket.onmessage = function(event) {
+                console.log("Message received:", event.data);
+                try {
+                    const signalData = JSON.parse(event.data);
+                    addSignalToList(signalData);
+                } catch (e) {
+                    console.error("Failed to parse signal message:", e);
+                    // Add raw message if parse fails
+                     const li = document.createElement('li');
+                     li.style.color = 'grey';
+                     li.textContent = `RAW: ${event.data}`;
+                     messagesList.insertBefore(li, messagesList.firstChild);
+                }
+            };
+
+            socket.onclose = function(event) {
+                console.log("WebSocket connection closed:", event);
+                let reason = event.wasClean ? "Clean" : `Unclean (Code: ${event.code})`;
+                updateStatus(`Disconnected (${reason}). Reconnecting in 5s...`, "red");
+                socket = null;
+                setTimeout(connectWebSocket, 5000); // Retry connection
+            };
+
+            socket.onerror = function(error) {
+                console.error("WebSocket Error:", error);
+                updateStatus("Connection Error (Check Console)", "red");
+                // Close might be triggered automatically, rely on onclose for reconnect
+            };
+        }
+
+        // Initial connection attempt
+        connectWebSocket();
+
+    </script>
+</body>
+</html>
